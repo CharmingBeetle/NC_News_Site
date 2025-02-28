@@ -84,7 +84,7 @@ function createTopics(topics) {
         return db.query(insertTopicsQuery)
   });
 }
-  function createArticles(articles) {
+function createArticles(articles) {
     return db.query(
       `CREATE TABLE articles (
       article_id SERIAL PRIMARY KEY,
@@ -119,7 +119,7 @@ function createTopics(topics) {
         return db.query(insertArticlesQuery)
   });
     }
-    function createComments(comments) {
+function createComments(comments) {
       return db.query(
       `CREATE TABLE comments (
         comment_id SERIAL PRIMARY KEY NOT NULL,
