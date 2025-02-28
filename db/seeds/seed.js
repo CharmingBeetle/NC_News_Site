@@ -6,6 +6,7 @@ const topics = require("../data/test-data/index")
 const { convertTimestampToDate } = require("./utils")
 const { createLookupObject } = require("./utils")
 
+
 const seed = ({ topicData, userData, articleData, commentData }) => {
   console.log('invoking seed...')
   return db
@@ -29,7 +30,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     return createArticles(articleData);
   })
   .then(() => {
-    return createComments(commentData);
+    return createComments(commentData, createLookupObject);
   })
 }
 //<< write your first query in here.
@@ -51,8 +52,6 @@ function createUsers(users) {
       user.name, 
       user.avatar_url
     ]})
-  
-  console.log(formattedUsers, "<<<<< FORMATTED USERS")
 
       const insertUsersQuery = format(
         `INSERT INTO users (username, name, avatar_url) VALUES %L RETURNING*`,
@@ -60,6 +59,12 @@ function createUsers(users) {
        
         return db.query(insertUsersQuery)
   })
+  // .then(()=> {
+  //   const sqlQuery = format(
+  //     'SELECT * FROM users = %L RETURNING*', formattedUsers);
+  //       console.log(sqlQuery)
+  //       return db.query(sqlQuery)
+  // })
 }
 function createTopics(topics) {
   return db.query(
@@ -77,7 +82,6 @@ function createTopics(topics) {
       topic.img_url
     ]})
   
-  console.log(formattedTopics, "<<<<< FORMATTED TOPICS")
       const insertTopicsQuery = format(
         `INSERT INTO topics (slug, description, img_url) VALUES %L RETURNING*`,
         formattedTopics);
@@ -101,7 +105,7 @@ function createArticles(articles) {
     .then(() => {
       const formattedArticles = articles.map((article) => {
        const formatArticle = convertTimestampToDate(article)
-       console.log(formatArticle, "<<<<< formatted timestamp")
+       
       return [
       formatArticle.title, 
       formatArticle.topic, 
@@ -111,22 +115,25 @@ function createArticles(articles) {
       formatArticle.votes, 
       formatArticle.article_img_url
     ]})
-  
-  console.log(formattedArticles, "<<<<< FORMATTED TOPICS")
       const insertArticlesQuery = format(
         `INSERT INTO articles (title,topic,author,body,created_at,votes, article_img_url) VALUES %L RETURNING*`,
         formattedArticles);
-        console.log(insertArticlesQuery)
         return db.query(insertArticlesQuery)
-  });
+  })
+  .then(({rows})=> {
+    const articleLookup = createLookupObject(rows, 'title', 'article_id')
+    console.log(articleLookup)
+    return articleLookup
+  })
     }
-function createComments(comments) {
+function createComments(comments, articleLookup) {
       return db.query(
       `CREATE TABLE comments (
         comment_id SERIAL PRIMARY KEY NOT NULL,
         article_id INT,
         FOREIGN KEY (article_id) REFERENCES articles(article_id),
         body TEXT NOT NULL,
+        title VARCHAR(255),
         votes INT DEFAULT 0,
         author VARCHAR(255),
         FOREIGN KEY(author) REFERENCES users(username), 
@@ -135,9 +142,10 @@ function createComments(comments) {
         .then(() => {
           const formattedComments = comments.map((comment) => {
            const formatComment = convertTimestampToDate(comment)
-           console.log(formatComment, "<<<<< formatted timestamp")
+           
           return [
-          formatComment.article_id, 
+          formatComment.article_id,
+          articleLookup[formatComment.article_id], 
           formatComment.body, 
           formatComment.votes, 
           formatComment.author, 
@@ -145,11 +153,14 @@ function createComments(comments) {
         ]})
       
           const insertCommentsQuery = format(
-            `INSERT INTO comments (article_id, body, votes, author, created_at) VALUES %L RETURNING*`,
+            `INSERT INTO comments (article_id, title, body, votes, author, created_at) VALUES %L RETURNING*`,
             formattedComments);
+            console.log(insertCommentsQuery)
             return db.query(insertCommentsQuery)
       });
       }
+
+    
 
 module.exports = seed;
 
