@@ -1,5 +1,5 @@
 const {
-  convertTimestampToDate
+  convertTimestampToDate, createLookupObject
 } = require("../db/seeds/utils");
 
 describe("convertTimestampToDate", () => {
@@ -38,3 +38,18 @@ describe("convertTimestampToDate", () => {
   });
 });
 
+
+describe('createLookUpObject', () => {
+    test('Returns an object when passed an array, target key and target value', () => {
+        // Assign
+        const input = 
+        const expected = <expected>
+        // Act
+        const actual = functionName(input)
+        // Assert
+        expect(actual).toEqual(expected)
+    });
+describe('functionName', () => {
+test.todo(' ')
+test.todo(' ')
+});

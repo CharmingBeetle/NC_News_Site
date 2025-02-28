@@ -3,7 +3,8 @@ const articles = require("../data/test-data/articles");
 const users = require("../data/test-data/index")
 const format = require("pg-format");
 const topics = require("../data/test-data/index")
-const {convertTimestampToDate} = require("./utils")
+const { convertTimestampToDate } = require("./utils")
+const { createLookupObject } = require("./utils")
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   console.log('invoking seed...')
@@ -89,8 +90,8 @@ function createArticles(articles) {
       `CREATE TABLE articles (
       article_id SERIAL PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
-      topic VARCHAR(255) NOT NULL,
-      author VARCHAR(255) NOT NULL, 
+      topic VARCHAR(255) REFERENCES topics(slug),
+      author VARCHAR(255) REFERENCES users(username), 
       body TEXT NOT NULL, 
       created_at TIMESTAMP NOT NULL, 
       votes INT DEFAULT 0, 
@@ -151,3 +152,6 @@ function createComments(comments) {
       }
 
 module.exports = seed;
+
+
+
