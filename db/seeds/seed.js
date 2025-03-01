@@ -29,8 +29,8 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
   .then(() => {
     return createArticles(articleData);
   })
-  .then(() => {
-    return createComments(commentData, createLookupObject);
+  .then((articleLookup) => {
+    return createComments(commentData, articleLookup);
   })
 }
 //<< write your first query in here.
@@ -121,8 +121,9 @@ function createArticles(articles) {
         return db.query(insertArticlesQuery)
   })
   .then(({rows})=> {
-    const articleLookup = createLookupObject(rows, 'title', 'article_id')
-    console.log(articleLookup)
+    const articleLookup = createLookupObject(rows, 'article_id', 'title')
+    console.log(articleLookup, "<<<<ARTICLE LOOKUP")
+    console.log(rows, "<<<<HERE ARE THE ROWS")
     return articleLookup
   })
     }
@@ -132,8 +133,8 @@ function createComments(comments, articleLookup) {
         comment_id SERIAL PRIMARY KEY NOT NULL,
         article_id INT,
         FOREIGN KEY (article_id) REFERENCES articles(article_id),
-        body TEXT NOT NULL,
         title VARCHAR(255),
+        body TEXT NOT NULL,
         votes INT DEFAULT 0,
         author VARCHAR(255),
         FOREIGN KEY(author) REFERENCES users(username), 
@@ -142,22 +143,26 @@ function createComments(comments, articleLookup) {
         .then(() => {
           const formattedComments = comments.map((comment) => {
            const formatComment = convertTimestampToDate(comment)
-           
+          
           return [
           formatComment.article_id,
-          articleLookup[formatComment.article_id], 
-          formatComment.body, 
-          formatComment.votes, 
-          formatComment.author, 
+          articleLookup[formatCommentcomment.article_id],
+          comment.body, 
+          // articleLookup[formatComment.article_id],
+          comment.votes, 
+          comment.author, 
           formatComment.created_at 
         ]})
-      
+      console.log(formattedComments, "<<<<FORMATTED COMMENTS ")
           const insertCommentsQuery = format(
             `INSERT INTO comments (article_id, title, body, votes, author, created_at) VALUES %L RETURNING*`,
             formattedComments);
-            console.log(insertCommentsQuery)
+            // console.log(insertCommentsQuery)
             return db.query(insertCommentsQuery)
-      });
+      })
+      .then(({rows})=> {
+        console.log(rows, "<<<<<< HERE ARE THE COMMENTS")
+      })
       }
 
     

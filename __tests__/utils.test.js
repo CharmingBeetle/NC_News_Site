@@ -40,3 +40,48 @@ describe("convertTimestampToDate", () => {
   });
 });
 
+
+describe('createLookupObject', () => {
+    test('Returns an object when passed an array of multiple objects', () => {
+        // Assign
+        const input =
+        [
+            {
+              park_id: 1,
+              park_name: 'Park One',
+              year_opened: 2000,
+              annual_attendance: 180000
+            },
+            {
+              park_id: 2,
+              park_name: 'Park Two',
+              year_opened: 2001,
+              annual_attendance: 280000
+            },
+            {
+              park_id: 3,
+              park_name: 'Park Three',
+              year_opened: 2010,
+              annual_attendance: 380000
+            },
+            {
+              park_id: 4,
+              park_name: 'Park Four',
+              year_opened: 1998,
+              annual_attendance: 480000
+            }
+          ]
+        
+        const expected =   { 
+          'Park One': 1, 
+          'Park Two': 2, 
+          'Park Three': 3, 
+          'Park Four': 4 
+        }
+        // Act
+        const actual =  createLookupObject(input)
+        // Assert
+        expect(actual).toEqual(expected)
+    });
+  })
+
