@@ -5,9 +5,10 @@ exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
   return { created_at: new Date(created_at), ...otherProperties };
 };
 
-exports.getformattedArray=(array) => {
-    return array.map(element => [element])
-   
+exports.getformattedArray= (array, keys)=> {
+  return array.map(obj => {
+    return keys.map(key => obj[key])
+  })
 }
 
 exports.createLookupObject=(rowsData = [], targetKey, targetValue) => {

@@ -3,7 +3,7 @@ const articles = require("../data/test-data/articles");
 const users = require("../data/test-data/index")
 const format = require("pg-format");
 const topics = require("../data/test-data/index")
-const { convertTimestampToDate } = require("./utils")
+const { convertTimestampToDate, getformattedArray } = require("./utils")
 const { createLookupObject } = require("./utils")
 
 
@@ -43,16 +43,11 @@ function createUsers(users) {
     UNIQUE(username));
    `)
     .then(() => {
-      if(!Array.isArray(users)){
-        throw new Error("Users is not an array")
-      }
-      const formattedUsers = users.map((user) => {
-      return [
-      user.username, 
-      user.name, 
-      user.avatar_url
-    ]})
-
+      const keys = ['username', 'name', 'avatar_url']
+      const formattedUser = getformattedArray(users, keys)
+     
+    console.log(formattedUsers, "<<< FORMATTED USERS")
+    console.log(formattedUser, "<<< FORMATTED USER")
       const insertUsersQuery = format(
         `INSERT INTO users (username, name, avatar_url) VALUES %L RETURNING*`,
         formattedUsers);
@@ -163,9 +158,11 @@ function createComments(comments, articleLookup) {
       .then(({rows})=> {
         console.log(rows, "<<<<<< HERE ARE THE COMMENTS")
       })
+      
       }
+      
 
-    
+  
 
 module.exports = seed;
 
