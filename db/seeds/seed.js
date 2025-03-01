@@ -146,11 +146,11 @@ function createComments(comments, articleLookup) {
           
           return [
           formatComment.article_id,
-          articleLookup[formatCommentcomment.article_id],
-          comment.body, 
+          articleLookup[formatComment.article_id],
+          formatComment.body, 
           // articleLookup[formatComment.article_id],
-          comment.votes, 
-          comment.author, 
+          formatComment.votes, 
+          formatComment.author, 
           formatComment.created_at 
         ]})
       console.log(formattedComments, "<<<<FORMATTED COMMENTS ")
