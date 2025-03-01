@@ -91,9 +91,6 @@ function createArticles(articles) {
     );
     `)
     .then(() => {
-      // const keys = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url']
-      
-      // const formattedArticles = getformattedArray(articles, keys)
       const formattedArticles = articles.map((article) => {
         const formatArticle = convertTimestampToDate(article)
        

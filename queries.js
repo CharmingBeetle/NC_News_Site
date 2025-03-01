@@ -62,7 +62,38 @@ getTopics()
 .then(()=> {
     console.log("Query completed!")
 })
+
+async function getArticleByUser(author) {
+    try {
+        const response = await db.query('SELECT title FROM articles WHERE author = $1',[author])
+        console.log(`ARTICLES BY USER: ${author}`,response.rows)
+        return response.rows
+    } catch (err) {
+        console.error('Error gettting articles table!', err)
+        throw err
+    }
+}
+getArticleByUser('grumpy19')
+.then(()=> {
+    console.log("Query completed!/n")
+})
+
+async function getPopularComments() {
+    try {
+        const response = await db.query('SELECT * FROM comments WHERE votes > 10' )
+        console.log("POPULAR COMMENTS: ", response.rows)
+        return response.rows
+    } catch (err) {
+        console.error("'Error getting comments table!', err")
+        throw err
+    }
+}
+getPopularComments()
+.then(()=> {
+    console.log("Query completed!")
+})
 .then(()=> {
     db.end()
     console.log("Connection closed.")
 })
+
