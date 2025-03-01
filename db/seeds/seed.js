@@ -1,8 +1,5 @@
 const db = require("../connection");
-const articles = require("../data/test-data/articles");
-const users = require("../data/test-data/index")
 const format = require("pg-format");
-const topics = require("../data/test-data/index")
 const { convertTimestampToDate, getformattedArray } = require("./utils")
 const { createLookupObject } = require("./utils")
 
