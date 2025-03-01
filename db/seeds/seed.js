@@ -44,22 +44,13 @@ function createUsers(users) {
    `)
     .then(() => {
       const keys = ['username', 'name', 'avatar_url']
-      const formattedUser = getformattedArray(users, keys)
-     
-    console.log(formattedUsers, "<<< FORMATTED USERS")
-    console.log(formattedUser, "<<< FORMATTED USER")
+      const formattedUsers = getformattedArray(users, keys)
+      console.log(formattedUsers, "<<< FORMATTED USERS")
       const insertUsersQuery = format(
         `INSERT INTO users (username, name, avatar_url) VALUES %L RETURNING*`,
         formattedUsers);
-       
         return db.query(insertUsersQuery)
   })
-  // .then(()=> {
-  //   const sqlQuery = format(
-  //     'SELECT * FROM users = %L RETURNING*', formattedUsers);
-  //       console.log(sqlQuery)
-  //       return db.query(sqlQuery)
-  // })
 }
 function createTopics(topics) {
   return db.query(
@@ -70,12 +61,14 @@ function createTopics(topics) {
     UNIQUE(slug));
     `)
     .then(() => {
-      const formattedTopics = topics.map((topic) => {
-      return [
-      topic.slug, 
-      topic.description, 
-      topic.img_url
-    ]})
+      const keys = ['slug', 'description', 'img_url']
+      const formattedTopics = getformattedArray(topics, keys)
+    //   const formattedTopics = topics.map((topic) => {
+    //   return [
+    //   topic.slug, 
+    //   topic.description, 
+    //   topic.img_url
+    // ]})
   
       const insertTopicsQuery = format(
         `INSERT INTO topics (slug, description, img_url) VALUES %L RETURNING*`,
@@ -98,8 +91,11 @@ function createArticles(articles) {
     );
     `)
     .then(() => {
+      // const keys = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'article_img_url']
+      
+      // const formattedArticles = getformattedArray(articles, keys)
       const formattedArticles = articles.map((article) => {
-       const formatArticle = convertTimestampToDate(article)
+        const formatArticle = convertTimestampToDate(article)
        
       return [
       formatArticle.title, 
@@ -110,13 +106,14 @@ function createArticles(articles) {
       formatArticle.votes, 
       formatArticle.article_img_url
     ]})
+    console.log(formattedArticles, "<<<FORMATTED ARTICLES")
       const insertArticlesQuery = format(
         `INSERT INTO articles (title,topic,author,body,created_at,votes, article_img_url) VALUES %L RETURNING*`,
         formattedArticles);
         return db.query(insertArticlesQuery)
   })
   .then(({rows})=> {
-    const articleLookup = createLookupObject(rows, 'article_id', 'title')
+    const articleLookup = createLookupObject(rows, 'title', 'article_id')
     console.log(articleLookup, "<<<<ARTICLE LOOKUP")
     console.log(rows, "<<<<HERE ARE THE ROWS")
     return articleLookup
@@ -128,7 +125,7 @@ function createComments(comments, articleLookup) {
         comment_id SERIAL PRIMARY KEY NOT NULL,
         article_id INT,
         FOREIGN KEY (article_id) REFERENCES articles(article_id),
-        title VARCHAR(255),
+        article_title VARCHAR(255),
         body TEXT NOT NULL,
         votes INT DEFAULT 0,
         author VARCHAR(255),
@@ -138,21 +135,20 @@ function createComments(comments, articleLookup) {
         .then(() => {
           const formattedComments = comments.map((comment) => {
            const formatComment = convertTimestampToDate(comment)
-          
+        
           return [
-          formatComment.article_id,
-          articleLookup[formatComment.article_id],
+          articleLookup[formatComment.article_title],
+          formatComment.article_title,
           formatComment.body, 
-          // articleLookup[formatComment.article_id],
           formatComment.votes, 
           formatComment.author, 
           formatComment.created_at 
         ]})
       console.log(formattedComments, "<<<<FORMATTED COMMENTS ")
+     
           const insertCommentsQuery = format(
-            `INSERT INTO comments (article_id, title, body, votes, author, created_at) VALUES %L RETURNING*`,
+            `INSERT INTO comments (article_id, article_title, body, votes, author, created_at) VALUES %L RETURNING*`,
             formattedComments);
-            // console.log(insertCommentsQuery)
             return db.query(insertCommentsQuery)
       })
       .then(({rows})=> {

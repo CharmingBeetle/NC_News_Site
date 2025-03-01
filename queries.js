@@ -1,37 +1,68 @@
 const db = require("./db/connection")
 const format = require("pg-format")
-const user = require("./db/data/test-data/index")
 
-// const sqlQuery = format('SELECT * FROM users = %L', users);
-// // SELECT * FROM t WHERE c1 IN ('1','2','3') AND c2 = '{"a":1,"b":2}'
-//     console.log(sqlQuery)
-//     return db.query(sqlQuery)
-// Function to query the users table
 async function getUsers() {
     try {
-      await db.connect(); // Connect to the database
-      const res = await db.query('SELECT * FROM users;'); // Execute the query
-      console.log("Users:", res.rows); // Log the results
-      return res.rows; // Return the results
+        const response = await db.query('SELECT * FROM users')
+        console.log(`ALL NC USERS: `, response.rows)
+        return response.rows
     } catch (err) {
-      console.error("Error querying users table:", err);
+        console.error('Error getting users table!', err)
+        throw err
     }
-      await db.end(); // Disconnect from the database
-    }
-  
-  
-  // Call the function
-  getUsers();
+}
+  getUsers()
+  .then(()=> {
+    console.log("Query completed!")
+  })
 
 
-
-  async function getCodingArticles() {
-  try {
-    return new Promise((resolve, reject))=> {
-    
+async function getCodingArticles() {
+    try {
+        const response = await db.query(`SELECT * FROM articles WHERE topic = 'coding'`)
+        console.log(`Articles: `, response.rows)
+        return response.rows
+    } catch (err) {
+        console.error('Error getting articles table!', err)
+        throw err
     }
-  } catch  {
-    
-  }
-    
-  }
+}
+getCodingArticles()
+.then(()=> {
+    console.log("Query completed!")
+});
+
+
+async function getUnpopularComments() {
+    try{
+        const response = await db.query('SELECT * FROM comments WHERE votes < 0')
+        console.log(`Unpopular Comments:`, response.rows)
+        return response.rows
+    } catch(err) {
+        console.error('Error getting comments table!', err)
+        throw err
+    }
+    }
+getUnpopularComments()
+.then(()=> {
+    console.log("Query completed!")
+});
+
+async function getTopics() {
+    try {
+    const response = await db.query('SELECT * FROM topics')
+    console.log("ALL TOPICS: ", response.rows)
+    return response.rows 
+} catch(err) {
+    console.error('Error getting topics table!', err)
+    throw err
+}
+}
+getTopics()
+.then(()=> {
+    console.log("Query completed!")
+})
+.then(()=> {
+    db.end()
+    console.log("Connection closed.")
+})
