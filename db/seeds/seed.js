@@ -42,7 +42,7 @@ function createUsers(users) {
     .then(() => {
       const keys = ['username', 'name', 'avatar_url']
       const formattedUsers = getformattedArray(users, keys)
-      console.log(formattedUsers, "<<< FORMATTED USERS")
+      // console.log(formattedUsers, "<<< FORMATTED USERS")
       const insertUsersQuery = format(
         `INSERT INTO users (username, name, avatar_url) VALUES %L RETURNING*`,
         formattedUsers);
@@ -70,7 +70,7 @@ function createTopics(topics) {
       const insertTopicsQuery = format(
         `INSERT INTO topics (slug, description, img_url) VALUES %L RETURNING*`,
         formattedTopics);
-        console.log(insertTopicsQuery)
+        
         return db.query(insertTopicsQuery)
   });
 }
@@ -100,7 +100,7 @@ function createArticles(articles) {
       formatArticle.votes, 
       formatArticle.article_img_url
     ]})
-    console.log(formattedArticles, "<<<FORMATTED ARTICLES")
+    // console.log(formattedArticles, "<<<FORMATTED ARTICLES")
       const insertArticlesQuery = format(
         `INSERT INTO articles (title,topic,author,body,created_at,votes, article_img_url) VALUES %L RETURNING*`,
         formattedArticles);
@@ -108,8 +108,8 @@ function createArticles(articles) {
   })
   .then(({rows})=> {
     const articleLookup = createLookupObject(rows, 'title', 'article_id')
-    console.log(articleLookup, "<<<<ARTICLE LOOKUP")
-    console.log(rows, "<<<<HERE ARE THE ROWS")
+    // console.log(articleLookup, "<<<<ARTICLE LOOKUP")
+    // console.log(rows, "<<<<HERE ARE THE ROWS")
     return articleLookup
   })
     }
@@ -138,7 +138,7 @@ function createComments(comments, articleLookup) {
           formatComment.author, 
           formatComment.created_at 
         ]})
-      console.log(formattedComments, "<<<<FORMATTED COMMENTS ")
+      // console.log(formattedComments, "<<<<FORMATTED COMMENTS ")
      
           const insertCommentsQuery = format(
             `INSERT INTO comments (article_id, article_title, body, votes, author, created_at) VALUES %L RETURNING*`,
@@ -146,7 +146,7 @@ function createComments(comments, articleLookup) {
             return db.query(insertCommentsQuery)
       })
       .then(({rows})=> {
-        console.log(rows, "<<<<<< HERE ARE THE COMMENTS")
+        // console.log(rows, "<<<<<< HERE ARE THE COMMENTS")
       })
       
       }
