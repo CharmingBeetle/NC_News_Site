@@ -25,7 +25,7 @@ describe("GET /api", () => {
         expect(endpoints).toEqual(endpointsJson);
       });
   });
-  describe("GET /api/topics", () => {
+describe("GET /api/topics", () => {
   test("200: Responds an array of topics", () => {
     return request(app)
       .get("/api/topics")
@@ -39,7 +39,17 @@ describe("GET /api", () => {
           expect(typeof topic.slug).toBe("string");
           expect(typeof topic.img_url).toBe("string");
         })
-      });
-  });
+      })
+    })
 });
-})
+describe("ANY: /notpath", ()=> {
+  test("404: Responds with error if path not found",() => {
+      return request(app)
+          .get('/notpath')
+          .expect(404)
+          .then(({body}) => {
+              expect(body.msg).toBe("Path not found")
+                      })
+                      })
+          })
+        })
