@@ -147,6 +147,7 @@ function createComments(comments, articleLookup) {
       })
       .then(({rows})=> {
         // console.log(rows, "<<<<<< HERE ARE THE COMMENTS")
+        return rows
       })
       
       }
