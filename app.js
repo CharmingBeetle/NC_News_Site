@@ -3,6 +3,7 @@ const app = express()
 const { getEndpoints } = require("./controllers/endpoints.controller")
 const { handleServerErrors, handlePsqlErrors, handleCustomErrors } = require("./controllers/errors.controller")
 const { getTopics } = require("./controllers/topics.controller")
+const { getArticleById } = require("./controllers/articles.controller")
 app.use(express.json())
 
 
@@ -13,7 +14,8 @@ app.get("/api", getEndpoints)
  //GET
 app.get("/api/topics", getTopics)
 
-// app.get("api/articles", getArticles)
+// ARTICLES
+app.get("/api/articles/:article_id", getArticleById)
 
 //ERROR HANDLING
 app.all('*', (req, res)=> {
