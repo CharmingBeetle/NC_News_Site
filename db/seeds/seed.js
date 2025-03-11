@@ -5,7 +5,7 @@ const { createLookupObject } = require("./utils")
 
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
-  console.log('invoking seed...')
+  // console.log('invoking seed...')
   return db
   .query("DROP TABLE IF EXISTS comments;")
   .then(() => {

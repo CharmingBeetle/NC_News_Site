@@ -75,8 +75,9 @@ describe("GET /api", () => {
       return request(app)
         .get("/api/articles/2")
         .expect(200)
-        .then(({body: {article}}) => { //rather than reponse.body.article
-        
+        .then(({ body: { article } }) => {
+          //rather than reponse.body.article
+
           expect(article.article_id).toBe(2);
           expect(article.title).toBe("Sony Vaio; or, The Laptop");
           expect(article.topic).toBe("mitch");
@@ -105,81 +106,118 @@ describe("GET /api", () => {
           expect(body.msg).toBe("Article not found!");
         });
     });
-describe("GET: /api/article/:article_id/comments", () => {
-    test("200: Responds with an array of comments when passed an article id.", () => {
-      return request(app)
-        .get("/api/articles/9/comments")
-        .expect(200)
-        .then((response) => {
-          const {comments} = response.body;
-          expect(comments.length).toBe(2);
-          expect(comments).toBeSortedBy("created_at", { descending: true });
-          comments.forEach((comment) => {
-            expect(typeof comment.comment_id).toBe("number");
-            expect(typeof comment.votes).toBe("number");
-            expect(typeof comment.created_at).toBe("string");
-            expect(typeof comment.author).toBe("string");
-            expect(typeof comment.body).toBe("string");
-            expect(typeof comment.article_id).toBe("number");
+    describe("GET: /api/article/:article_id/comments", () => {
+      test("200: Responds with an array of comments when passed an article id.", () => {
+        return request(app)
+          .get("/api/articles/9/comments")
+          .expect(200)
+          .then((response) => {
+            const { comments } = response.body;
+            expect(comments.length).toBe(2);
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+            comments.forEach((comment) => {
+              expect(typeof comment.comment_id).toBe("number");
+              expect(typeof comment.votes).toBe("number");
+              expect(typeof comment.created_at).toBe("string");
+              expect(typeof comment.author).toBe("string");
+              expect(typeof comment.body).toBe("string");
+              expect(typeof comment.article_id).toBe("number");
+            });
           });
-        });
-    });
-    test("400: Responds with error if article ID is not valid", () => {
-      return request(app)
-        .get("/api/articles/notValidId")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad request");
-        });
-    });
-    test("200: Responds with an empty array if category exists but no comments", () => {
-      return request(app)
-        .get("/api/articles/4/comments")
-        .expect(200)
-        .then(({ body }) => {
-          const { comments } = body;
-          expect(comments).toEqual([]);
-        });
+      });
+      test("400: Responds with error if article ID is not valid", () => {
+        return request(app)
+          .get("/api/articles/notValidId")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+          });
+      });
+      test("200: Responds with an empty array if category exists but no comments", () => {
+        return request(app)
+          .get("/api/articles/4/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments).toEqual([]);
+          });
+      });
     });
   });
 });
-describe("POST: /api/articles/:article_id/comments", () => {
-  test("201: Creates a new comment object and inserts the comment into the database, responding with the inserted comment.", ()=> {
-    const timestamp = new Date()
-    const timestampStr = timestamp.toISOString()
+describe("PATCH: /api/articles/:article_id", () => {
+  test("200: Successfully updated an article of a given ID vote property when passed an increase vote object.", () => {
     return request(app)
-    .post("/api/articles/4/comments")
-    .send({ 
-      article_title: "Hello from test",
-      body: "Testing, testing, testing",
-      votes: 7,
-      author: "rogersop",
-      created_at: timestamp
-    })
-    .expect(201)
-    .then(({ body: {newComment} })=> {
-      
-      const {article_id, comment_id, article_title, body, votes, author, created_at } = newComment;
-      expect(article_id).toBe(4)
-      expect(article_title).toBe("Hello from test")
-      expect(comment_id).toBe(19)
-      expect(body).toBe("Testing, testing, testing")
-      expect(votes).toBe(7)
-      expect(author).toBe("rogersop")
-      expect(created_at).toBe(timestampStr)
-    })
-  })
-  test("400: Responds with error if input invalid", () => {
-    const timestamp = new Date()
-    
+      .patch("/api/articles/4")
+      .send({ inc_votes: 10 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(10);
+      });
+  });
+  test("400: Responds with error if vote input not invalid", () => {
+    return request(app)
+      .patch("/api/articles/4")
+      .send({ inc_votes: "cats" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input");
+      });
+  });
+  test("404: Responds with error if article ID doesn't exist", () => {
+    return request(app)
+      .patch("/api/articles/99999")
+      .send({ inc_votes: 10 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article 99999 not found");
+      });
+  });
+});
+describe("POST: /api/articles/:article_id/comments", () => {
+  test("201: Creates a new comment object and inserts the comment into the database, responding with the inserted comment.", () => {
+    const timestamp = new Date();
+    const timestampStr = timestamp.toISOString();
     return request(app)
       .post("/api/articles/4/comments")
-      .send({ 
+      .send({
+        article_title: "Hello from test",
+        body: "Testing, testing, testing",
+        votes: 7,
+        author: "rogersop",
+        created_at: timestamp,
+      })
+      .expect(201)
+      .then(({ body: { newComment } }) => {
+        const {
+          article_id,
+          comment_id,
+          article_title,
+          body,
+          votes,
+          author,
+          created_at,
+        } = newComment;
+        expect(article_id).toBe(4);
+        expect(article_title).toBe("Hello from test");
+        expect(comment_id).toBe(19);
+        expect(body).toBe("Testing, testing, testing");
+        expect(votes).toBe(7);
+        expect(author).toBe("rogersop");
+        expect(created_at).toBe(timestampStr);
+      });
+  });
+  test("400: Responds with error if input invalid", () => {
+    const timestamp = new Date();
+
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({
         article_title: 800,
         body: 600,
         votes: 7,
         author: "rogersop",
-        created_at: timestamp
+        created_at: timestamp,
       })
       .expect(400)
       .then(({ body }) => {
@@ -187,25 +225,23 @@ describe("POST: /api/articles/:article_id/comments", () => {
       });
   });
   test("404: Responds with error if username not found", () => {
-    const timestamp = new Date()
-    
+    const timestamp = new Date();
+
     return request(app)
       .post("/api/articles/4/comments")
-      .send({ 
+      .send({
         article_title: "Test",
         body: "Testing, testing 123..",
         votes: 7,
         author: "charming_beetle",
-        created_at: timestamp
+        created_at: timestamp,
       })
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("User charming_beetle not found");
-
       });
   });
-})
-})
+});
 describe("ANY: /notpath", () => {
   test("404: Responds with error if path not found", () => {
     return request(app)
