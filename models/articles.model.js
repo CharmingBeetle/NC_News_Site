@@ -26,7 +26,7 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
   if (!validSorts.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid sort input" });
   }
-  if (!order || !validOrder.includes(order)) {
+  if (!validOrder.includes(order)) {
     return Promise.reject({ status: 400, msg: "Invalid order" });
   }
   let sqlQuery = `
@@ -72,3 +72,37 @@ exports.fetchCommentsByArticleId = (article_id) => {
       throw error;
     });
 };
+
+exports.createComment = (article_id, article_title, body, votes, author, created_at) => {
+   
+    if(typeof article_title !== "string" || typeof body !== "string" || typeof author !== "string") {
+        return Promise.reject({status: 400, msg: "Invalid input"})
+    }
+    return db.query(`
+        INSERT INTO comments 
+        (article_id, 
+        article_title, 
+        body, 
+        votes, 
+        author, 
+        created_at) 
+        VALUES 
+        ($1, $2, $3, $4, $5, $6) 
+        RETURNING *
+        `, [article_id, article_title, body, votes, author, created_at])
+.then(({ rows })=> {
+    return rows[0]
+})
+}
+
+exports.checkIfUserExists = (author) => {
+    return db.query(`SELECT * FROM users WHERE username = $1`, [author])
+    .then(({ rows })=> {
+        if(!rows.length) {
+            return Promise.reject({status:404, msg: `User ${author} not found`})
+        }
+        return rows[0]
+    })
+}
+
+
