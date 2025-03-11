@@ -1,6 +1,7 @@
 const {
   fetchArticleById,
-  fetchArticles, fetchCommentsByArticleId,
+  fetchArticles, fetchCommentsByArticleId, createComment,
+  checkIfUserExists
 } = require("../models/articles.model");
 
 exports.getArticleById = (request, response, next) => {
@@ -10,9 +11,7 @@ exports.getArticleById = (request, response, next) => {
     .then((article) => {
       response.status(200).send({ article });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next)
 };
 
 exports.getArticles = (request, response, next) => {
@@ -22,10 +21,9 @@ exports.getArticles = (request, response, next) => {
     .then((articles) => {
       response.status(200).send({ articles });
     })
-    .catch((err) => {
-      next(err);
-    });
-};
+    .catch(next)
+    }
+
 
 exports.getCommentsByArticleId = (request, response, next) => {
   const { article_id } = request.params;
@@ -34,7 +32,22 @@ exports.getCommentsByArticleId = (request, response, next) => {
     .then((comments) => {
       response.status(200).send({ comments });
     })
-    .catch((err) => {
-      next(err);
-    });
-};
+    .catch(next)
+    };
+
+exports.postComment=(request, response, next)=> {
+    const { article_title, body, votes, author, created_at } = request.body
+    const { article_id } = request.params
+
+  checkIfUserExists(author)
+  .then(()=> {
+     return createComment(article_id, article_title, body, votes, author, created_at)
+  })
+    .then((newComment)=> { 
+        response.status(201).send({newComment})
+    })
+    .catch(next)
+  }
+   
+
+
