@@ -14,7 +14,7 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all articles ordered by date with a comment count",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": ["author", "topic", "sort_by", "order", "votes", "created_at", "title"],
     "exampleResponse": {
       "articles": [
         {
@@ -131,8 +131,8 @@
     "description": "deletes the comment with a given ID",
     "queries": [],
     "exampleResponse": {}
-    }, 
-    "GET /api/users/:username": {
+  }, 
+  "GET /api/users/:username": {
     "description": "serves an array of all users sorted by username",
     "queries": ["sort_by", "order"],
     "exampleResponse": {
