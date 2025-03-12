@@ -46,9 +46,9 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
         GROUP BY 
         articles.article_id `;
 
-  if (sort_by && validSorts.includes(sort_by)) {
+
     sqlQuery += ` ORDER BY ${sort_by} ${order.toLowerCase()}`;
-  }
+
 
   return db.query(sqlQuery).then(({ rows }) => {
     return rows;

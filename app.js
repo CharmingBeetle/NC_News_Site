@@ -16,6 +16,7 @@ const {
 } = require("./controllers/articles.controller");
 const { deleteCommentById } = require("./controllers/comments.controller")
 app.use(express.json());
+const { getUsers } = require("./controllers/users.contoller")
 
 //GET ENDPOINTS
 app.get("/api", getEndpoints);
@@ -33,6 +34,9 @@ app.post("/api/articles/:article_id/comments", postComment);
 
 // COMMENTS
 app.delete("/api/comments/:comment_id", deleteCommentById)
+
+// USERS
+app.get("/api/users", getUsers)
 
 //ERROR HANDLING
 app.all("*", (req, res) => {
