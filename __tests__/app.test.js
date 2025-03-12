@@ -106,41 +106,41 @@ describe("GET /api", () => {
           expect(body.msg).toBe("Article not found!");
         });
     });
-    describe("GET: /api/article/:article_id/comments", () => {
-      test("200: Responds with an array of comments when passed an article id.", () => {
-        return request(app)
-          .get("/api/articles/9/comments")
-          .expect(200)
-          .then((response) => {
-            const { comments } = response.body;
-            expect(comments.length).toBe(2);
-            expect(comments).toBeSortedBy("created_at", { descending: true });
-            comments.forEach((comment) => {
-              expect(typeof comment.comment_id).toBe("number");
-              expect(typeof comment.votes).toBe("number");
-              expect(typeof comment.created_at).toBe("string");
-              expect(typeof comment.author).toBe("string");
-              expect(typeof comment.body).toBe("string");
-              expect(typeof comment.article_id).toBe("number");
-            });
+  describe("GET: /api/article/:article_id/comments", () => {
+    test("200: Responds with an array of comments when passed an article id.", () => {
+      return request(app)
+        .get("/api/articles/9/comments")
+        .expect(200)
+        .then((response) => {
+          const { comments } = response.body;
+          expect(comments.length).toBe(2);
+          expect(comments).toBeSortedBy("created_at", { descending: true });
+          comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number");
+            expect(typeof comment.votes).toBe("number");
+            expect(typeof comment.created_at).toBe("string");
+            expect(typeof comment.author).toBe("string");
+            expect(typeof comment.body).toBe("string");
+            expect(typeof comment.article_id).toBe("number");
           });
-      });
-      test("400: Responds with error if article ID is not valid", () => {
-        return request(app)
-          .get("/api/articles/notValidId")
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Bad request");
-          });
-      });
-      test("200: Responds with an empty array if category exists but no comments", () => {
-        return request(app)
-          .get("/api/articles/4/comments")
-          .expect(200)
-          .then(({ body }) => {
-            const { comments } = body;
-            expect(comments).toEqual([]);
-          });
+        });
+    });
+    test("400: Responds with error if article ID is not valid", () => {
+      return request(app)
+        .get("/api/articles/notValidId")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+    test("200: Responds with an empty array if category exists but no comments", () => {
+      return request(app)
+        .get("/api/articles/4/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toEqual([]);
+        });
       });
     });
   });
@@ -239,6 +239,32 @@ describe("POST: /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("User charming_beetle not found");
+      });
+  });
+});
+describe("DELETE: /api/comments/:comments", () => {
+  test("204: Deletes an existing comment object given comment ID.", () => {
+    return request(app)
+      .delete("/api/comments/8")
+      .expect(204)
+      .then((response) => {
+        expect(response.body).toEqual({});
+      });
+  });
+  test("400: Responds with error if invalid ID", () => {
+    return request(app)
+      .delete("/api/comments/notValid")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("404: Responds with error if comment not found", () => {
+    return request(app)
+      .delete("/api/comments/99999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment not found");
       });
   });
 });
