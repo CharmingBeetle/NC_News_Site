@@ -62,7 +62,12 @@ exports.postComment = (request, response, next) => {
 exports.patchVoteByArticleId = (request, response, next) => {
   const { inc_votes } = request.body;
   const { article_id } = request.params;
-
+  if(!inc_votes) {
+    return response.status(400).send({msg: "missing properties in request body"})
+  }
+  if(isNaN(article_id)) {
+    return response.status(400).send({msg:"Invalid article id"})
+  }
   checkIfArticleExists(article_id)
     .then(() => {
       return updateVoteByArticleId(article_id, inc_votes);

@@ -125,7 +125,7 @@ exports.updateVoteByArticleId = (article_id, inc_votes) => {
   return db.query(sqlQuery, queryValues).then(({ rows }) => {
     return rows[0];
   });
-};
+}; 
 
 exports.checkIfUserExists = (author) => {
   return db

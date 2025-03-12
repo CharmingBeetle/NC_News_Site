@@ -172,6 +172,24 @@ describe("PATCH: /api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Article 99999 not found");
       });
+    })
+  test("400: Responds with error if missing properties in request body", () => {
+        return request(app)
+          .patch("/api/articles/4")
+          .send({})
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("missing properties in request body");
+          });
+      });
+  test("400: Responds with error if article ID invalid", () => {
+    return request(app)
+      .patch("/api/articles/notValid")
+      .send({ inc_votes: 10 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid article id");
+      });
   });
 });
 describe("POST: /api/articles/:article_id/comments", () => {
