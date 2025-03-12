@@ -40,6 +40,26 @@ describe("GET /api", () => {
     });
   });
   describe("GET: /api/articles", () => {
+    test("200: Responds with an array of all articles when no query passed.", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body.articles;
+          expect(articles.length).toBe(13);
+          articles.forEach((article) => {
+            expect(article.comment_count).toBeGreaterThanOrEqual(0);
+            expect(typeof article.article_id).toBe("number");
+            expect(typeof article.title).toBe("string");
+            expect(typeof article.topic).toBe("string");
+            expect(typeof article.author).toBe("string");
+            expect(typeof article.created_at).toBe("string");
+            expect(typeof article.votes).toBe("number");
+            expect(typeof article.article_img_url).toBe("string");
+            expect(typeof article.comment_count).toBe("number");
+          });
+        });
+    });
     test("200: Responds with an array of all articles with total comment count for each article ID.", () => {
       return request(app)
         .get("/api/articles?sort_by=created_at&order=desc")
