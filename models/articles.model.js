@@ -77,9 +77,9 @@ exports.createComment = (
   article_id,
   article_title,
   body,
-  votes,
+  votes=0,
   author,
-  created_at
+  created_at=new Date()
 ) => {
   if (
     typeof article_title !== "string" ||
