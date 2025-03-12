@@ -89,6 +89,22 @@ describe("GET /api", () => {
           expect(body.msg).toBe("Bad request");
         });
     });
+    test("400: Responds with error if sort query entered is not valid", () => {
+      return request(app)
+        .get("/api/articles?sort_by=cats")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid sort input");
+        });
+    });
+    test("400: Responds with error if order query entered is not valid", () => {
+      return request(app)
+        .get("/api/articles?order=invalid")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid order");
+        });
+    });
   });
   describe("GET: /api/articles/:article_id", () => {
     test("200: Responds with an individual article object when passed an article id.", () => {
@@ -126,45 +142,101 @@ describe("GET /api", () => {
           expect(body.msg).toBe("Article not found!");
         });
     });
-  describe("GET: /api/article/:article_id/comments", () => {
-    test("200: Responds with an array of comments when passed an article id.", () => {
-      return request(app)
-        .get("/api/articles/9/comments")
-        .expect(200)
-        .then((response) => {
-          const { comments } = response.body;
-          expect(comments.length).toBe(2);
-          expect(comments).toBeSortedBy("created_at", { descending: true });
-          comments.forEach((comment) => {
-            expect(typeof comment.comment_id).toBe("number");
-            expect(typeof comment.votes).toBe("number");
-            expect(typeof comment.created_at).toBe("string");
-            expect(typeof comment.author).toBe("string");
-            expect(typeof comment.body).toBe("string");
-            expect(typeof comment.article_id).toBe("number");
+    describe("GET: /api/article/:article_id/comments", () => {
+      test("200: Responds with an array of comments when passed an article id.", () => {
+        return request(app)
+          .get("/api/articles/9/comments")
+          .expect(200)
+          .then((response) => {
+            const { comments } = response.body;
+            expect(comments.length).toBe(2);
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+            comments.forEach((comment) => {
+              expect(typeof comment.comment_id).toBe("number");
+              expect(typeof comment.votes).toBe("number");
+              expect(typeof comment.created_at).toBe("string");
+              expect(typeof comment.author).toBe("string");
+              expect(typeof comment.body).toBe("string");
+              expect(typeof comment.article_id).toBe("number");
+            });
           });
-        });
-    });
-    test("400: Responds with error if article ID is not valid", () => {
-      return request(app)
-        .get("/api/articles/notValidId")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad request");
-        });
-    });
-    test("200: Responds with an empty array if category exists but no comments", () => {
-      return request(app)
-        .get("/api/articles/4/comments")
-        .expect(200)
-        .then(({ body }) => {
-          const { comments } = body;
-          expect(comments).toEqual([]);
-        });
+      });
+      test("400: Responds with error if article ID is not valid", () => {
+        return request(app)
+          .get("/api/articles/notValidId")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+          });
+      });
+      test("200: Responds with an empty array if category exists but no comments", () => {
+        return request(app)
+          .get("/api/articles/4/comments")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments).toEqual([]);
+          });
       });
     });
   });
-});
+  describe("GET: /api/users", () => {
+    test("200: Responds with an array of all users", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body: { users } }) => {
+          // const users = body.users;
+          console.log(users, "<<<<<<< USERS");
+          expect(users.length).toBe(4);
+          users.forEach((user) => {
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+                name: expect.any(String),
+                avatar_url: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("200: Responds with an array of all users sorted in ascending order by username", () => {
+      return request(app)
+        .get("/api/users?sort_by=username&order=asc")
+        .expect(200)
+        .then(({ body: { users } }) => {
+      
+          expect(users.length).toBe(4);
+          expect(users).toBeSortedBy("username", { ascending: true });
+          users.forEach((user) => {
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+                name: expect.any(String),
+                avatar_url: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("400: Responds with error if sort query entered is not valid", () => {
+      return request(app)
+        .get("/api/users?sort_by=cats")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid sort input");
+        });
+    });
+    test("400: Responds with error if order query entered is not valid", () => {
+      return request(app)
+        .get("/api/users?order=invalid")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid order");
+        });
+    });
+  })
+})
 describe("PATCH: /api/articles/:article_id", () => {
   test("200: Successfully updated an article of a given ID vote property when passed an increase vote object.", () => {
     return request(app)
@@ -192,16 +264,16 @@ describe("PATCH: /api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Article 99999 not found");
       });
-    })
+  });
   test("400: Responds with error if missing properties in request body", () => {
-        return request(app)
-          .patch("/api/articles/4")
-          .send({})
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("missing properties in request body");
-          });
+    return request(app)
+      .patch("/api/articles/4")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("missing properties in request body");
       });
+  });
   test("400: Responds with error if article ID invalid", () => {
     return request(app)
       .patch("/api/articles/notValid")
@@ -316,3 +388,4 @@ describe("ANY: /notpath", () => {
       });
   });
 });
+
