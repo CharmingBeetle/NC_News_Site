@@ -62,7 +62,8 @@
           "author": "butter_bridge",
           "created_at": "2020-04-06, 13:17:00",
           "votes": 100, 
-          "img_url": "https://www.example.com"
+          "img_url": "https://www.example.com",
+          "comment_count": 11
         }
       ]
     }
