@@ -1,7 +1,6 @@
 const db = require("../db/connection");
 
 exports.fetchArticleById = (article_id) => {
-
   let sqlQuery = `
     SELECT 
     articles.author,
@@ -20,14 +19,12 @@ exports.fetchArticleById = (article_id) => {
     WHERE articles.article_id = $1 
     GROUP BY articles.article_id`;
 
-  return db
-    .query(sqlQuery, [article_id])
-    .then(({ rows }) => {
-      if (!rows.length) {
-        return Promise.reject({ status: 404, msg: "Article not found!" });
-      }
-      return rows[0];
-    });
+  return db.query(sqlQuery, [article_id]).then(({ rows }) => {
+    if (!rows.length) {
+      return Promise.reject({ status: 404, msg: "Article not found!" });
+    }
+    return rows[0];
+  });
 };
 
 exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
@@ -97,38 +94,28 @@ exports.fetchCommentsByArticleId = (article_id) => {
     });
 };
 
-exports.createComment = (
-  article_id,
-  article_title,
-  body,
-  votes = 0,
-  author,
-  created_at = new Date()
-) => {
-  if (
-    typeof article_title !== "string" ||
-    typeof body !== "string" ||
-    typeof author !== "string"
-  ) {
-    return Promise.reject({ status: 400, msg: "Invalid input" });
-  }
-  return db
-    .query(
-      `
+exports.createComment = (article_id, body, username) => {
+  return this.checkIfArticleExists(article_id)
+    .then((article) => {
+      console.log("Article data:", article);
+      return db.query(
+        `
         INSERT INTO comments 
         (article_id, 
-        article_title, 
-        body, 
-        votes, 
+        article_title,
+        body,  
         author, 
-        created_at) 
+        votes, 
+        created_at)
         VALUES 
-        ($1, $2, $3, $4, $5, $6) 
+        ($1, $2, $3, $4, 0, CURRENT_TIMESTAMP) 
         RETURNING *
         `,
-      [article_id, article_title, body, votes, author, created_at]
-    )
+        [article_id, article.title, body, username]
+      );
+    })
     .then(({ rows }) => {
+      console.log("Inserted comment:", rows[0]);
       return rows[0];
     });
 };
@@ -151,14 +138,17 @@ exports.updateVoteByArticleId = (article_id, inc_votes) => {
   });
 };
 
-exports.checkIfUserExists = (author) => {
+exports.checkIfUserExists = (username) => {
   return db
-    .query(`SELECT * FROM users WHERE username = $1`, [author])
+    .query(`SELECT * FROM users WHERE username = $1`, [username])
     .then(({ rows }) => {
       if (!rows.length) {
-        return Promise.reject({ status: 404, msg: `User ${author} not found` });
+        return Promise.reject({
+          status: 404,
+          msg: `User ${username} not found`,
+        });
       }
-      return rows[0];
+      return true;
     });
 };
 
@@ -172,7 +162,7 @@ exports.checkIfArticleExists = (article_id) => {
           msg: `Article ${article_id} not found`,
         });
       }
-      return article_id;
+      return rows[0];
     });
 };
 

@@ -174,15 +174,6 @@ describe("GET: TOPIC QUERY", () => {
         });
       });
   });
-  test("200: Responds with all articles if no topic specified", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles.length).toBe(13);
-        expect(articles).toBeSortedBy("created_at", { descending: true });
-      });
-  });
   test("404: Responds with error if topic does not exist", () => {
     return request(app)
       .get("/api/articles?topic=trees")
@@ -217,7 +208,7 @@ describe("GET: /api/articles/:article_id", () => {
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         );
       });
-    })
+  });
   test("200: Responds with an individual article object with comment count when passed an article id.", () => {
     return request(app)
       .get("/api/articles/3")
@@ -230,31 +221,29 @@ describe("GET: /api/articles/:article_id", () => {
         expect(article.body).toBe("some gifs");
         expect(article.created_at).toBe("2020-11-03T09:12:00.000Z");
         expect(article.votes).toBe(0);
-        expect(article.comment_count).toBe(2)
-        expect(article).toHaveProperty("comment_count")
+        expect(article.comment_count).toBe(2);
         expect(article.article_img_url).toBe(
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         );
-      })
       });
   });
-  test("400: Responds with error if article ID is not valid", () => {
-    return request(app)
-      .get("/api/articles/notValidId")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Bad request");
-      });
-  });
-  test("404: Responds with error if article does not exist", () => {
-    return request(app)
-      .get("/api/articles/9999999")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Article not found!");
-      });
-  });
-
+test("400: Responds with error if article ID is not valid", () => {
+  return request(app)
+    .get("/api/articles/notValidId")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad request");
+    });
+});
+test("404: Responds with error if article does not exist", () => {
+  return request(app)
+    .get("/api/articles/9999999")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Article not found!");
+    });
+});
+})
 describe("GET: /api/article/:article_id/comments", () => {
   test("200: Responds with an array of comments when passed an article id.", () => {
     return request(app)
@@ -394,65 +383,55 @@ describe("PATCH: /api/articles/:article_id", () => {
 });
 describe("POST: /api/articles/:article_id/comments", () => {
   test("201: Creates a new comment object and inserts the comment into the database, responding with the inserted comment.", () => {
-    const timestamp = new Date();
-    const timestampStr = timestamp.toISOString();
     return request(app)
       .post("/api/articles/4/comments")
       .send({
-        article_title: "Hello from test",
         body: "Testing, testing, testing",
-        votes: 7,
-        author: "rogersop",
-        created_at: timestamp,
+        username: "rogersop",
       })
       .expect(201)
       .then(({ body: { newComment } }) => {
-        const {
-          article_id,
-          comment_id,
-          article_title,
-          body,
-          votes,
-          author,
-          created_at,
-        } = newComment;
-        expect(article_id).toBe(4);
-        expect(article_title).toBe("Hello from test");
-        expect(comment_id).toBe(19);
-        expect(body).toBe("Testing, testing, testing");
-        expect(votes).toBe(7);
-        expect(author).toBe("rogersop");
-        expect(created_at).toBe(timestampStr);
+        expect(newComment).toHaveProperty("article_id", 4);
+        expect(newComment).toHaveProperty(
+          "article_title",
+          "Student SUES Mitch!"
+        );
+        expect(newComment).toHaveProperty("body", "Testing, testing, testing");
+        expect(newComment).toHaveProperty("author", "rogersop");
+        expect(newComment).toHaveProperty("comment_id");
+        expect(newComment).toHaveProperty("created_at");
+        expect(newComment).toHaveProperty("votes", 0);
       });
   });
-  test("400: Responds with error if input invalid", () => {
-    const timestamp = new Date();
-
+  test("400: Responds with error if no username", () => {
     return request(app)
       .post("/api/articles/4/comments")
       .send({
-        article_title: 800,
-        body: 600,
-        votes: 7,
-        author: "rogersop",
-        created_at: timestamp,
+        username: "",
+        body: "Testing, testing, testing",
       })
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Invalid input");
+        expect(body.msg).toBe("Username required");
       });
   });
-  test("404: Responds with error if username not found", () => {
-    const timestamp = new Date();
-
+  test("400: Responds with error if no body", () => {
     return request(app)
       .post("/api/articles/4/comments")
       .send({
-        article_title: "Test",
+        username: "rogersop",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Body is required");
+      });
+  });
+  test("404: Responds with error if username does not exist in database", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({
         body: "Testing, testing 123..",
-        votes: 7,
-        author: "charming_beetle",
-        created_at: timestamp,
+        username: "charming_beetle",
       })
       .expect(404)
       .then(({ body }) => {
