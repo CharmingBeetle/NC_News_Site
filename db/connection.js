@@ -13,7 +13,7 @@ if (ENV === "production") {
 if (!process.env.PGDATABASE && !process.env.DATABASE_URL) {
     throw new Error("PGDATABASE or DATABASE_URL not configured")
 } else { 
-    console.log(`Connected to ${process.env.PGDATABASE}`)
+    console.log(`Connected to the ${ENV} database`)
 }
 
 module.exports = db;
