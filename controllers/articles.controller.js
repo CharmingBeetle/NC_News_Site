@@ -21,19 +21,17 @@ exports.getArticleById = (request, response, next) => {
 
 exports.getArticles = (request, response, next) => {
   const { sort_by, order, topic } = request.query;
+  const articlesPromise = fetchArticles(sort_by, order, topic);
 
   if (!topic) {
-    fetchArticles(sort_by, order)
+    articlesPromise
       .then((articles) => {
         response.status(200).send({ articles });
       })
-      .catch(next)
+      .catch(next);
   } else {
-    return checkThatTopicExists(topic)
-      .then(() => {
-        return fetchArticles(sort_by, order, topic);
-      })
-      .then((articles) => {
+    Promise.all([checkThatTopicExists(topic), articlesPromise])
+      .then(([_, articles]) => {
         response.status(200).send({ articles });
       })
       .catch(next);
@@ -50,21 +48,22 @@ exports.getCommentsByArticleId = (request, response, next) => {
 };
 
 exports.postComment = (request, response, next) => {
-  const { article_title, body, votes, author, created_at } = request.body;
+  const { body, username } = request.body;
   const { article_id } = request.params;
 
-  checkIfUserExists(author)
+  if (!username) {
+    return next({ status: 400, msg: "Username required" });
+  }
+  if (!body) {
+    return next({ status: 400, msg: "Body is required" });
+  }
+
+  checkIfUserExists(username)
     .then(() => {
-      return createComment(
-        article_id,
-        article_title,
-        body,
-        votes,
-        author,
-        created_at
-      );
+      return createComment(article_id, body, username);
     })
     .then((newComment) => {
+      console.log("New comment created:", newComment);
       response.status(201).send({ newComment });
     })
     .catch(next);
