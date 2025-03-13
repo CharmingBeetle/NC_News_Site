@@ -63,7 +63,6 @@ exports.postComment = (request, response, next) => {
       return createComment(article_id, body, username);
     })
     .then((newComment) => {
-      console.log("New comment created:", newComment);
       response.status(201).send({ newComment });
     })
     .catch(next);
