@@ -132,7 +132,7 @@
     "queries": [],
     "exampleResponse": {}
   }, 
-  "GET /api/users/:username": {
+  "GET /api/users": {
     "description": "serves an array of all users sorted by username",
     "queries": ["sort_by", "order"],
     "exampleResponse": {

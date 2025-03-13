@@ -11,7 +11,7 @@ exports.fetchArticleById = (article_id) => {
     });
 };
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
+exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
   const validSorts = [
     "title",
     "author",
@@ -23,12 +23,13 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
   ];
   const validOrder = ["asc", "desc"];
 
-  if (!validSorts.includes(sort_by)) {
+  if (sort_by && !validSorts.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid sort input" });
   }
-  if (!validOrder.includes(order)) {
+  if (order && !validOrder.includes(order)) {
     return Promise.reject({ status: 400, msg: "Invalid order" });
   }
+
   let sqlQuery = `
         SELECT 
         articles.author,
@@ -43,14 +44,18 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
         articles
         LEFT JOIN 
         comments ON articles.article_id = comments.article_id
-        GROUP BY 
-        articles.article_id `;
+        `;
 
+  const queryValues = [];
 
-    sqlQuery += ` ORDER BY ${sort_by} ${order.toLowerCase()}`;
+  if (topic) {
+    sqlQuery += ` WHERE articles.topic = $1`;
+    queryValues.push(topic);
+  }
 
+  sqlQuery += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toLowerCase()}`;
 
-  return db.query(sqlQuery).then(({ rows }) => {
+  return db.query(sqlQuery, queryValues).then(({ rows }) => {
     return rows;
   });
 };
@@ -77,9 +82,9 @@ exports.createComment = (
   article_id,
   article_title,
   body,
-  votes=0,
+  votes = 0,
   author,
-  created_at=new Date()
+  created_at = new Date()
 ) => {
   if (
     typeof article_title !== "string" ||
@@ -125,7 +130,7 @@ exports.updateVoteByArticleId = (article_id, inc_votes) => {
   return db.query(sqlQuery, queryValues).then(({ rows }) => {
     return rows[0];
   });
-}; 
+};
 
 exports.checkIfUserExists = (author) => {
   return db
@@ -148,6 +153,20 @@ exports.checkIfArticleExists = (article_id) => {
           msg: `Article ${article_id} not found`,
         });
       }
-      return rows[0];
+      return article_id;
+    });
+};
+
+exports.checkThatTopicExists = (topic) => {
+  return db
+    .query(`SELECT * FROM topics WHERE slug = $1`, [topic])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `Topic '${topic}' does not exist`,
+        });
+      }
+      return topic;
     });
 };
