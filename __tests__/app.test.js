@@ -217,6 +217,26 @@ describe("GET: /api/articles/:article_id", () => {
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         );
       });
+    })
+  test("200: Responds with an individual article object with comment count when passed an article id.", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.article_id).toBe(3);
+        expect(article.title).toBe("Eight pug gifs that remind me of mitch");
+        expect(article.topic).toBe("mitch");
+        expect(article.author).toBe("icellusedkars");
+        expect(article.body).toBe("some gifs");
+        expect(article.created_at).toBe("2020-11-03T09:12:00.000Z");
+        expect(article.votes).toBe(0);
+        expect(article.comment_count).toBe(2)
+        expect(article).toHaveProperty("comment_count")
+        expect(article.article_img_url).toBe(
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
+      })
+      });
   });
   test("400: Responds with error if article ID is not valid", () => {
     return request(app)
@@ -234,7 +254,7 @@ describe("GET: /api/articles/:article_id", () => {
         expect(body.msg).toBe("Article not found!");
       });
   });
-});
+
 describe("GET: /api/article/:article_id/comments", () => {
   test("200: Responds with an array of comments when passed an article id.", () => {
     return request(app)
