@@ -97,7 +97,6 @@ exports.fetchCommentsByArticleId = (article_id) => {
 exports.createComment = (article_id, body, username) => {
   return this.checkIfArticleExists(article_id)
     .then((article) => {
-      console.log("Article data:", article);
       return db.query(
         `
         INSERT INTO comments 
