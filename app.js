@@ -16,9 +16,9 @@ const {
   postComment,
   patchVoteByArticleId,
 } = require("./controllers/articles.controller");
-const { deleteCommentById } = require("./controllers/comments.controller")
+const { deleteCommentById } = require("./controllers/comments.controller");
 app.use(express.json());
-const { getUsers } = require("./controllers/users.controller")
+const { getUsers } = require("./controllers/users.controller");
 app.use("/api", apiRouter);
 
 //GET ENDPOINTS
@@ -36,10 +36,10 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.post("/api/articles/:article_id/comments", postComment);
 
 // COMMENTS
-app.delete("/api/comments/:comment_id", deleteCommentById)
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 // USERS
-app.get("/api/users", getUsers)
+app.get("/api/users", getUsers);
 
 //ERROR HANDLING
 app.all("*", (req, res) => {
