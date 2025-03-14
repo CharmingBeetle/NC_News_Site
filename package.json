@@ -11,6 +11,7 @@
     "start": "nodemon listen.js",
     "test-seed": "jest seed.test.js", 
     "seed-prod": "NODE_ENV=production npm run seed-dev",
+    "seed": "node ./db/seeds/run-seed.js",
     "start-prod": "NODE_ENV=production npm run start"
   },
   "repository": {

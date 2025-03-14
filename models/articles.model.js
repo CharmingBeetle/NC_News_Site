@@ -27,7 +27,7 @@ exports.fetchArticleById = (article_id) => {
   });
 };
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.fetchArticles = (sort_by = "created_at", order = "asc", topic) => {
   const validSorts = [
     "title",
     "author",

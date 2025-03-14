@@ -62,12 +62,12 @@ describe("GET: /api/articles", () => {
   });
   test("200: Responds with an array of all articles with total comment count for each article ID.", () => {
     return request(app)
-      .get("/api/articles?sort_by=created_at&order=desc")
+      .get("/api/articles?sort_by=created_at&order=asc")
       .expect(200)
       .then(({ body }) => {
         const articles = body.articles;
         expect(articles.length).toBe(13);
-        expect(articles).toBeSortedBy("created_at", { descending: true });
+        expect(articles).toBeSortedBy("created_at", { ascending: true });
         articles.forEach((article) => {
           expect(article.comment_count).toBeGreaterThanOrEqual(0);
           expect(typeof article.article_id).toBe("number");
