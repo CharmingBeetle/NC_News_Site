@@ -114,7 +114,6 @@ exports.createComment = (article_id, body, username) => {
       );
     })
     .then(({ rows }) => {
-      console.log("Inserted comment:", rows[0]);
       return rows[0];
     });
 };
