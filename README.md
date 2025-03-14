@@ -117,6 +117,8 @@ devDependencies:
   - `nodemon: 3.1.9`
   - `supertest: 7.0.0`
 
+## Hosted version 
+`https://nc-news-site.onrender.com`
 
 ## Contributors
-This project was initiated as part of the Northcoders bootcamp. See GH `About` for a list of all contributors.
+This project was initiated as part of the Northcoders bootcamp. See GH `Contributors` for a list of all contributors.
