@@ -334,6 +334,37 @@ describe("GET: /api/users", () => {
       });
   });
 });
+describe("GET: /api/users/:username", () => {
+  test("200: Responds with an individual user profile when a username is passed", () => {
+    return request(app)
+      .get("/api/users/butter_bridge")
+      .expect(200)
+      .then(({ body: { user } }) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: "butter_bridge",
+              name: "jonny",
+              avatar_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+            })
+          );
+        });
+      });
+  test("400: Responds with error if invalid username input", () => {
+    return request(app)
+      .get("/api/users/inv lid")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid username");
+      });
+  });
+  test("404: Responds with error if username not exist", () => {
+    return request(app)
+      .get("/api/users/charming_beetle")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("User not found");
+      });
+  });
 describe("PATCH: /api/articles/:article_id", () => {
   test("200: Successfully updated an article of a given ID vote property when passed an increase vote object.", () => {
     return request(app)
@@ -475,3 +506,4 @@ describe("ANY: /notpath", () => {
       });
   });
 });
+})

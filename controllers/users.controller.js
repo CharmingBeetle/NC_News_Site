@@ -1,4 +1,5 @@
-const { fetchUsers } = require("../models/users.model");
+const { fetchUsers, fetchUserByUsername } = require("../models/users.model");
+const { checkIfUserExists } = require("../models/articles.model.js")
 
 exports.getUsers = (request, response, next) => {
     const { sort_by, order } = request.query
@@ -9,3 +10,17 @@ exports.getUsers = (request, response, next) => {
     })
     .catch(next);
 };
+
+exports.getUserByUsername = (request, response, next) => {
+  
+    const { username } = request.params
+    console.log("Requested username: ",request.params)
+
+   
+    fetchUserByUsername(username)
+    .then((user) => {
+      console.log("Requested user:", user)
+      response.status(200).send({ user })
+    })
+    .catch(next)
+}

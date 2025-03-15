@@ -18,7 +18,7 @@ const {
 } = require("./controllers/articles.controller");
 const { deleteCommentById } = require("./controllers/comments.controller");
 app.use(express.json());
-const { getUsers } = require("./controllers/users.controller");
+const { getUsers, getUserByUsername } = require("./controllers/users.controller");
 app.use("/api", apiRouter);
 
 //GET ENDPOINTS
@@ -40,6 +40,7 @@ app.delete("/api/comments/:comment_id", deleteCommentById);
 
 // USERS
 app.get("/api/users", getUsers);
+app.get("/api/users/:username", getUserByUsername)
 
 //ERROR HANDLING
 app.all("*", (req, res) => {

@@ -22,3 +22,20 @@ exports.fetchUsers = (sort_by = "username", order = "asc") => {
     return rows;
   });
 };
+
+
+exports.fetchUserByUsername = (username)=> {
+  const allowedInput = /^[-\w\.\$&@\*\!]{1,30}$/
+  const inputIsValid = username.match(allowedInput)
+  if(!inputIsValid){
+    return Promise.reject({status:400, msg:"Invalid username"})
+  }
+  return db.query(`SELECT * FROM users WHERE username = $1`, [username])
+  .then(({ rows })=> {
+    if(!rows.length) {
+      return Promise.reject({ status:404, msg: "User not found"})
+    }
+    console.log("Requested user: ",rows[0])
+    return rows[0]
+  })
+}
