@@ -5,7 +5,7 @@ const {
   createComment,
   checkIfUserExists,
   checkIfArticleExists,
-  updateVoteByArticleId,
+  updateByArticleId,
   checkThatTopicExists,
 } = require("../models/articles.model");
 
@@ -68,9 +68,10 @@ exports.postComment = (request, response, next) => {
     .catch(next);
 };
 
-exports.patchVoteByArticleId = (request, response, next) => {
+exports.patchByArticleId = (request, response, next) => {
   const { inc_votes } = request.body;
   const { article_id } = request.params;
+  
   if (!inc_votes) {
     return response
       .status(400)
@@ -81,7 +82,7 @@ exports.patchVoteByArticleId = (request, response, next) => {
   }
   checkIfArticleExists(article_id)
     .then(() => {
-      return updateVoteByArticleId(article_id, inc_votes);
+      return updateByArticleId(article_id, inc_votes);
     })
     .then((article) => {
       response.status(200).send({ article });

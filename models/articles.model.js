@@ -118,7 +118,7 @@ exports.createComment = (article_id, body, username) => {
     });
 };
 
-exports.updateVoteByArticleId = (article_id, inc_votes) => {
+exports.updateByArticleId = (article_id, inc_votes) => {
   if (typeof inc_votes !== "number") {
     return Promise.reject({ status: 400, msg: "Invalid input" });
   }

@@ -1,4 +1,4 @@
-const { removeCommentById, checkIfCommentExists } = require("../models/comments.model")
+const { removeCommentById, checkIfCommentExists, updateCommentById } = require("../models/comments.model")
 
 exports.deleteCommentById = (request, response, next) => {
     const { comment_id } = request.params
@@ -14,3 +14,26 @@ exports.deleteCommentById = (request, response, next) => {
     }
 
 
+exports.patchCommentById = (request, response, next) => {
+    const { comment_id } = request.params
+    const { inc_votes } = request.body
+
+    if (!inc_votes) {
+        return response
+          .status(400)
+          .send({ msg: "missing properties in request body" });
+      }
+      if (isNaN(comment_id)) {
+        return response.status(400).send({ msg: "Invalid comment id" });
+      }
+
+    checkIfCommentExists(comment_id)
+    .then(()=> {
+        return   updateCommentById(comment_id, inc_votes)
+    })
+        .then((comment)=> {
+            console.log(comment, "<<<<<<< RETURNED UPDATED COMMENT")
+            response.status(200).send({comment})
+    })
+    .catch(next)
+}

@@ -35,7 +35,6 @@ exports.fetchUserByUsername = (username)=> {
     if(!rows.length) {
       return Promise.reject({ status:404, msg: "User not found"})
     }
-    console.log("Requested user: ",rows[0])
     return rows[0]
   })
 }

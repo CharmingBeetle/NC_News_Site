@@ -162,7 +162,7 @@ describe("GET: Article Sorting: Responds with an array of all articles sorted by
       });
   });
 });
-describe("GET: TOPIC QUERY", () => {
+describe("GET: Topic Query: /api/articles?topic=", () => {
   test("200: Responds with all articles of a given topic", () => {
     return request(app)
       .get(`/api/articles?topic=cats`)
@@ -365,7 +365,8 @@ describe("GET: /api/users/:username", () => {
         expect(body.msg).toBe("User not found");
       });
   });
-describe("PATCH: /api/articles/:article_id", () => {
+})
+describe("PATCH VOTE: /api/articles/:article_id", () => {
   test("200: Successfully updated an article of a given ID vote property when passed an increase vote object.", () => {
     return request(app)
       .patch("/api/articles/4")
@@ -412,7 +413,7 @@ describe("PATCH: /api/articles/:article_id", () => {
       });
   });
 });
-describe("POST: /api/articles/:article_id/comments", () => {
+describe("POST COMMENT: /api/articles/:article_id/comments", () => {
   test("201: Creates a new comment object and inserts the comment into the database, responding with the inserted comment.", () => {
     return request(app)
       .post("/api/articles/4/comments")
@@ -470,7 +471,7 @@ describe("POST: /api/articles/:article_id/comments", () => {
       });
   });
 });
-describe("DELETE: /api/comments/:comments", () => {
+describe("DELETE COMMENT: /api/comments/:comments", () => {
   test("204: Deletes an existing comment object given comment ID.", () => {
     return request(app)
       .delete("/api/comments/8")
@@ -492,9 +493,56 @@ describe("DELETE: /api/comments/:comments", () => {
       .delete("/api/comments/99999")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Comment not found");
+        expect(body.msg).toBe("Comment 99999 not found");
       });
   });
+})
+describe("PATCH VOTE: /api/comments/:comments", () => {
+    test("200: Updates an existing vote on a comment given comment ID.", () => {
+      return request(app)
+        .patch("/api/comments/10")
+        .send({ inc_votes: 1000 })
+        .expect(200)
+        .then(({body: { comment }}) => {
+          expect(comment.votes).toBe(1000);
+        });
+    });
+    test("400: Responds with error if vote input not invalid", () => {
+      return request(app)
+        .patch("/api/comments/10")
+        .send({ inc_votes: "cats" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid input");
+        });
+    });
+    test("404: Responds with error if comment ID doesn't exist", () => {
+      return request(app)
+        .patch("/api/comments/99999")
+        .send({ inc_votes: 10 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Comment 99999 not found");
+        });
+    });
+    test("400: Responds with error if missing properties in request body", () => {
+      return request(app)
+        .patch("/api/comments/10")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("missing properties in request body");
+        });
+    });
+    test("400: Responds with error if comment ID invalid", () => {
+      return request(app)
+        .patch("/api/comments/notValid")
+        .send({ inc_votes: 10 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid comment id");
+        });
+    });
 });
 describe("ANY: /notpath", () => {
   test("404: Responds with error if path not found", () => {
@@ -506,4 +554,3 @@ describe("ANY: /notpath", () => {
       });
   });
 });
-})

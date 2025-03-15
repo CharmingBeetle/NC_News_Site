@@ -1,7 +1,7 @@
 const {
   getArticles,
   getArticleById,
-  patchVoteByArticleId,
+  patchByArticleId,
   getCommentsByArticleId,
   postComment,
 } = require("../controllers/articles.controller");
@@ -13,7 +13,7 @@ articlesRouter.route("/").get(getArticles);
 articlesRouter
   .route("/:article_id")
   .get(getArticleById)
-  .patch(patchVoteByArticleId);
+  .patch(patchByArticleId);
 
 articlesRouter
   .route("/:article_id/comments")
