@@ -3,11 +3,14 @@
 ## Introduction
 NC News is a social news and discussion site (similar to Reddit) where users can post articles on various topics, comment on articles. This repository contains the backend API for the NC News application.
 
+## Hosted version 
+`https://nc-news-site.onrender.com`
+
 ## Features
 - RESTful APIs with multiple endpoints
 - Articles organized by topics with unique IDs
 - User profiles 
-- Comment functionality (post/delete)
+- Comment functionality (post/patch/delete)
 - Comment count for each article
 - Query parameters for filtering and sorting
 - Database with PostgreSQL
@@ -51,9 +54,6 @@ Endpoint | Method | Description
    b. `.env.development`:
    PGDATABASE=nc_news
 
-   c. `.env.production`:
-   DATABASE_URL=superbase_url
-
 2. **Make sure your `.env` files are included in `.gitignore` to keep your database p/w hidden.**
 
 3. Set up databases and seed with scripts below:
@@ -68,9 +68,6 @@ To run the test environment:
 To run the development environment:
  - `npm run seed-dev`
 
-To start the production environment:
- - `npm start`
-
 The server will start on port 9090 which can be changed in listen.js
 
 ## All available scripts
@@ -82,7 +79,6 @@ Script | Description
  - `npm run test-seed` // Runs the seed tests only
  - `npm run setup-dbs` // Sets up PostgreSQL databases 
  - `npm run seed-dev` // Seeds development database 
- - `npm run seed-prod` // Seeds production database 
  - `npm run prepare` // Husky setup - unable to push unless all tests pass 
 
 ## Testing
@@ -96,8 +92,8 @@ Completed stages:
 1. Test and development SQL databases initialized
 2. Seed functions implemented
 3. Connection file and listener completed
-4. MCV query functions completed
-5. Function testing implemented
+4. MCV query functions as above
+5. Function testing implemented for completed functions
 6. API endpoints documented
 
 ## Dependencies
@@ -116,9 +112,6 @@ devDependencies:
   - `jest-sorted: 1.0.15`
   - `nodemon: 3.1.9`
   - `supertest: 7.0.0`
-
-## Hosted version 
-`https://nc-news-site.onrender.com`
 
 ## Contributors
 This project was initiated as part of the Northcoders bootcamp. See GH `Contributors` for a list of all contributors.
