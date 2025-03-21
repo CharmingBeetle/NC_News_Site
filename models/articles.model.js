@@ -94,7 +94,7 @@ exports.fetchCommentsByArticleId = (article_id) => {
     });
 };
 
-exports.createComment = (article_id, body, username) => {
+exports.insertComment = (article_id, body, username) => {
   return this.checkIfArticleExists(article_id)
     .then((article) => {
       return db.query(
@@ -113,6 +113,32 @@ exports.createComment = (article_id, body, username) => {
         [article_id, article.title, body, username]
       );
     })
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+exports.insertArticle = (
+  title,
+  topic,
+  author,
+  body,
+  article_img_url) => {
+  if (article_img_url === "") {
+    article_img_url = "https://picsum.photos/seed/picsum/200/300";
+  }
+
+  return db
+    .query(
+      `
+    INSERT INTO articles
+    (title, topic, author, body, created_at, votes, article_img_url)
+    VALUES
+    ($1, $2, $3, $4, CURRENT_TIMESTAMP, 0, $5)
+    RETURNING *, 0 AS comment_count;
+    `,
+      [title, topic, author, body, article_img_url]
+    )
     .then(({ rows }) => {
       return rows[0];
     });
@@ -137,8 +163,9 @@ exports.updateByArticleId = (article_id, inc_votes) => {
 };
 
 exports.checkIfUserExists = async (username) => {
-  const { rows } = await db
-    .query(`SELECT * FROM users WHERE username = $1`, [username]);
+  const { rows } = await db.query(`SELECT * FROM users WHERE username = $1`, [
+    username,
+  ]);
   if (!rows.length) {
     return Promise.reject({
       status: 404,

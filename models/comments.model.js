@@ -11,7 +11,6 @@ exports.removeCommentById = (comment_id) => {
 };
 
 exports.updateCommentById = (comment_id, inc_votes) => {
-  console.log("CONNECTED TO MODEL....")
   if(typeof inc_votes !== "number") {
     return Promise.reject({status:400, msg:"Invalid input"})
   }
@@ -27,7 +26,6 @@ const queryValues = [inc_votes, comment_id]
 
 return db.query(sqlQuery, queryValues)
 .then(({ rows })=> {
-  console.log(rows[0], "<<<<<< PATCHED COMMENT")
   return rows[0]
 })
 }

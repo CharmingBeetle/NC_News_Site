@@ -50,6 +50,32 @@
       ]
     }
   },
+  "POST /api/articles": {
+    "description": "posts a new article with votes and comments with an article ID",
+    "queries": [],
+    "exampleRequest": {
+      "article":
+        {
+          "author": "rogersop", 
+          "title": "This is a new article!", 
+          "body": "A new article to be posted.", 
+          "topic": "cats", 
+          "article_img_url": "https://picsum.photos/id/237/200/300"
+        },
+      "exampleReponse": [
+        {
+          "article_id": 14,
+          "author":"rogersop",
+          "title":"This is a new article!",
+          "body": "A new article to be posted.",
+          "topic":"cats", 
+          "article_img_url":"https://picsum.photos/id/237/200/300", 
+          "votes": 0,
+          "comment_count": 0
+        }
+      ]
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves an article with a given ID",
     "queries": [],

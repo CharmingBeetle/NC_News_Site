@@ -32,7 +32,6 @@ exports.patchCommentById = (request, response, next) => {
         return   updateCommentById(comment_id, inc_votes)
     })
         .then((comment)=> {
-            console.log(comment, "<<<<<<< RETURNED UPDATED COMMENT")
             response.status(200).send({comment})
     })
     .catch(next)

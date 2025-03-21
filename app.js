@@ -12,6 +12,7 @@ const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticleById,
   getArticles,
+  postArticle,
   getCommentsByArticleId,
   postComment,
   patchByArticleId,
@@ -30,6 +31,7 @@ app.get("/api/topics", getTopics);
 
 // ARTICLES
 app.get("/api/articles", getArticles);
+app.post("/api/articles", postArticle)
 app.get("/api/articles/:article_id", getArticleById);
 app.patch("/api/articles/:article_id", patchByArticleId);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);

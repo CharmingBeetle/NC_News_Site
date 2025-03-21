@@ -82,6 +82,97 @@ describe("GET: /api/articles", () => {
       });
   });
 });
+describe("POST ARTICLE: /api/articles", () => {
+  test("201: Creates a new article object and inserts the article into the database, responding with the inserted article.", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "rogersop", 
+        title: "This is a new article!", 
+        body: "A new article to be posted.", 
+        topic: "cats", 
+        article_img_url: "https://picsum.photos/id/237/200/300"
+      })
+      .expect(201)
+      .then(({ body: { newArticle } }) => {
+        expect(newArticle).toHaveProperty("article_id", 14);
+        expect(newArticle).toHaveProperty("author", "rogersop")
+        expect(newArticle).toHaveProperty("title", "This is a new article!");
+        expect(newArticle).toHaveProperty("body", "A new article to be posted.");
+        expect(newArticle).toHaveProperty("topic", "cats");
+        expect(newArticle).toHaveProperty("article_img_url", "https://picsum.photos/id/237/200/300");
+        expect(newArticle).toHaveProperty("created_at")
+        expect(newArticle).toHaveProperty("votes", 0);
+      
+        expect(newArticle).toHaveProperty("comment_count", 0);
+        expect(newArticle).toEqual(
+          expect.objectContaining({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            title: expect.any(String),
+            body: expect.any(String),
+            topic: expect.any(String),
+            article_img_url: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(Number)
+      }))
+      });
+  });
+  test("400: Responds with error if missing elements from request body", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing request");
+      });
+  });
+  test("400: Responds with error if invalid request", () => {
+    return request(app)
+      .post("/api/articles/")
+      .send({
+        author: 3, 
+        title: "This is a new article!", 
+        body: "This is the body of the article.", 
+        topic: "coding", 
+        article_img_url: "https://picsum.photos/seed/picsum/200/300"
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid field entry");
+      });
+  });
+  test("404: Responds with error if user doesn't exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "charming_beetle", 
+        title: "This is a new article!", 
+        body: "A new article to be posted.", 
+        topic: "cats", 
+        article_img_url: "https://picsum.photos/id/237/200/300"
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("User charming_beetle not found")
+      });
+  });
+  test("201: Responds with default image if image not provided", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "rogersop", 
+        title: "This is a new article!", 
+        body: "A new article to be posted.", 
+        topic: "cats", 
+        article_img_url: ""
+      })
+      .expect(201)
+      .then(({ body: {newArticle} }) => {
+        expect(newArticle.article_img_url).toBe("https://picsum.photos/seed/picsum/200/300")  
+      });
+  });
 describe("GET: Article Sorting: Responds with an array of all articles sorted by any column in any order", () => {
   test("200: Sorted by: Title:ASC", () => {
     return request(app)
@@ -471,6 +562,7 @@ describe("POST COMMENT: /api/articles/:article_id/comments", () => {
       });
   });
 });
+})
 describe("DELETE COMMENT: /api/comments/:comments", () => {
   test("204: Deletes an existing comment object given comment ID.", () => {
     return request(app)

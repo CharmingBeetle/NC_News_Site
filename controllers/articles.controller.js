@@ -2,7 +2,8 @@ const {
   fetchArticleById,
   fetchArticles,
   fetchCommentsByArticleId,
-  createComment,
+  insertComment,
+  insertArticle,
   checkIfUserExists,
   checkIfArticleExists,
   updateByArticleId,
@@ -47,6 +48,28 @@ exports.getCommentsByArticleId = (request, response, next) => {
     .catch(next);
 };
 
+exports.postArticle = (request, response, next) => {
+  const { title, topic, author, body, article_img_url } = request.body
+
+  if(!author || !title || !body || !topic) {
+    return next({status: 400, msg:"Missing request"})
+  }
+ 
+  if(typeof author !== "string" || typeof title !== "string" || typeof topic !== "string" || typeof body !== "string" || article_img_url && typeof article_img_url !== "string") {
+    return next({status: 400, msg:"Invalid field entry"})
+  }
+ 
+   checkIfUserExists(author)
+  .then(()=> {
+    return insertArticle(title, topic, author, body, article_img_url)
+  })
+    .then((newArticle)=> {
+      response.status(201).send({ newArticle })
+    })
+    .catch(next)
+    }
+
+
 exports.postComment = (request, response, next) => {
   const { body, username } = request.body;
   const { article_id } = request.params;
@@ -60,7 +83,7 @@ exports.postComment = (request, response, next) => {
 
   checkIfUserExists(username)
     .then(() => {
-      return createComment(article_id, body, username);
+      return insertComment(article_id, body, username);
     })
     .then((newComment) => {
       response.status(201).send({ newComment });
@@ -71,7 +94,7 @@ exports.postComment = (request, response, next) => {
 exports.patchByArticleId = (request, response, next) => {
   const { inc_votes } = request.body;
   const { article_id } = request.params;
-  
+
   if (!inc_votes) {
     return response
       .status(400)
