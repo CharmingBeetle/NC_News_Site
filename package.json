@@ -9,7 +9,7 @@
     "test": "jest --runInBand --verbose",
     "prepare": "husky install",
     "start": "nodemon listen.js",
-    "test-seed": "jest seed.test.js", 
+    "test-seed": "jest seed.test.js",
     "seed-prod": "NODE_ENV=production npm run seed-dev",
     "seed": "node ./db/seeds/run-seed.js",
     "start-prod": "NODE_ENV=production npm run start"
@@ -34,6 +34,7 @@
     "supertest": "^7.0.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "pg": "^8.13.3",

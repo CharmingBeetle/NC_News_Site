@@ -1,3 +1,4 @@
+const cors = require("cors")
 const express = require("express");
 const apiRouter = require("./routes/api-router");
 const app = express();
@@ -18,6 +19,8 @@ const {
   patchByArticleId,
 } = require("./controllers/articles.controller");
 const { deleteCommentById, patchCommentById } = require("./controllers/comments.controller");
+
+app.use(cors());
 app.use(express.json());
 const { getUsers, getUserByUsername } = require("./controllers/users.controller");
 app.use("/api", apiRouter);
