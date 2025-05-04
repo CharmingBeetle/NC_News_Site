@@ -1,7 +1,7 @@
-# Welcome to NC News!
+# Welcome to Thought Bubble! (aka. NC News)
 
 ## Introduction
-NC News is a social news and discussion site (similar to Reddit) where users can post articles on various topics, comment on articles. This repository contains the backend API for the NC News application.
+Thought Bubble is a social news and discussion site (similar to Reddit) where users can post articles on various topics, comment on articles. This repository contains the backend API for the NC News application.
 
 ## Hosted version 
 [NC News](https://nc-news-site.onrender.com)
